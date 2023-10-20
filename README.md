@@ -15,7 +15,7 @@ Ansible role состоит из следующих групп tasks:
 
 В templates/ лежат файлы конфигураций:
 - homeserver.yaml.j2 - конфигурация matrix-synapse
-- matrix.conf.j2, matrix-admin.conf.j2, element.conf.j2 - конфигурация сайтов для nginx
+- matrix.conf.j2, synadmin.conf.j2, element.conf.j2 - конфигурация сайтов для nginx
 - config.json.j2 - конфигурация element-web
 - turnserver.conf.j2 - конфигурация coturn
 - docker-compose.yml.j2 - конфигурация Docker Compose для synapse-admin

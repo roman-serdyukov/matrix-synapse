@@ -1,0 +1,20 @@
+# Task for install coturn
+
+- name: Install coturn | Installing the coturn
+  become: True
+  ansible.builtin.apt:
+    name: coturn
+    state: latest
+
+- name: Install coturn | Copy config files
+  become: True
+  ansible.builtin.template:
+    src: templates/turnserver.conf.j2
+    dest: /etc/turnserver.conf
+
+- name: Install coturn | Enable and start coturn
+  become: true
+  ansible.builtin.systemd:
+    state: started
+    name: coturn
+    enabled: true

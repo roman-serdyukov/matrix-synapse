@@ -1,0 +1,54 @@
+# Task for install synapse
+
+- name: Install matrix-synapse | Download file gpg
+  become: true
+  ansible.builtin.get_url:
+    url: '{{ repo_url }}matrix-org-archive-keyring.gpg'
+    dest: '{{ key_folder }}matrix-org-archive-keyring.gpg'
+
+- name: Install matrix-synapse | Adding a repository for synapse in Debian
+  become: true
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+    - echo "deb [signed-by={{ key_folder }}matrix-org-archive-keyring.gpg] {{ repo_url }} $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/matrix-org.list
+
+- name: Install matrix-synapse | Update apt cache
+  become: true
+  apt:
+    upgrade: full
+    update_cache: yes 
+
+- name: Install matrix-synapse | Installing the Matrix Synapse
+  become: True
+  ansible.builtin.apt:
+#  ansible.builtin.shell: DEBIAN_FRONTEND=noninteractive apt install -y -q matrix-synapse-py3
+    name: matrix-synapse-py3
+    state: latest
+
+- name: Install matrix-synapse | Generate registration shared secret
+  ansible.builtin.shell: openssl rand -base64 48
+  register: reg_sec
+
+- name: Install matrix-synapse | Generate turn shared secret
+  ansible.builtin.shell: openssl rand -base64 48
+  register: turn_sec
+
+- name: Install matrix-synapse | Copy config files
+  become: True
+  ansible.builtin.template:
+    src: templates/homeserver.yaml.j2
+    dest: /etc/matrix-synapse/homeserver.yaml
+
+- name: Install matrix-synapse | Set server name
+  become: true
+  ansible.builtin.lineinfile:
+    dest: "/etc/matrix-synapse/conf.d/server_name.yaml"
+    regexp: "^server_name:"
+    line: "server_name: {{ matrix }}.{{ my_domain }}"
+
+- name: Install matrix-synapse | Restart matrix-synapse and enabled
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    name: matrix-synapse
+    enabled: true

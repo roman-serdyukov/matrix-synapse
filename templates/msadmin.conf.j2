@@ -1,0 +1,31 @@
+server {
+    listen 80;
+#    listen [::]:80;
+    server_name msadmin.{{ my_domain }};
+    return 301 https://$host$request_uri;
+
+    location / {
+  #      allow 1.1.1.1; #Allowed IP
+  #      allow 8.8.8.8/24; #Allowed Subnet
+  #      deny all;
+        proxy_pass http://localhost:8088/;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+#    listen [::]:443 ssl http2;
+    server_name msadmin.{{ my_domain }};
+
+    ssl_certificate /etc/letsencrypt/live/msadmin.{{ my_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/msadmin.{{ my_domain }}/privkey.pem;
+
+    location / {
+#        allow 1.1.1.1; #Allowed IP
+#        allow 8.8.8.8/24; #Allowed Subnet
+#        deny all;
+        proxy_pass http://localhost:8088/;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}

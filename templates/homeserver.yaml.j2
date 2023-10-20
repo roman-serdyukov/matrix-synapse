@@ -1,0 +1,55 @@
+# Configuration file for Synapse.
+#
+# This is a YAML file: see [1] for a quick introduction. Note in particular
+# that *indentation is important*: all the elements of a list or dictionary
+# should have the same indentation.
+#
+# [1] https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+#
+# For more information on how to configure Synapse, including a complete accounting of
+# each option, go to docs/usage/configuration/config_documentation.md or
+# https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html
+#
+# This is set in /etc/matrix-synapse/conf.d/server_name.yaml for Debian installations.
+# server_name: "SERVERNAME"
+pid_file: "/var/run/matrix-synapse.pid"
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+#    bind_addresses: ['127.0.0.1']
+    resources:
+      - names: [client]
+        compress: false
+database:
+  name: psycopg2
+  txn_limit: 10000
+  args:
+    user: {{ db_user }}
+    password: {{ db_pass}}
+    database: {{ db_name }}
+    host: localhost
+    port: 5432
+    cp_min: 5
+    cp_max: 10
+log_config: "/etc/matrix-synapse/log.yaml"
+media_store_path: /var/lib/matrix-synapse/media
+signing_key_path: "/etc/matrix-synapse/homeserver.signing.key"
+trusted_key_servers:
+  - server_name: "{{ matrix }}.{{ my_domain }}"
+suppress_key_server_warning: true
+max_upload_size: 100M
+# enable_registration: false
+enable_registration: true
+enable_registration_without_verification: true
+matrix_synapse_federation_enabled: false
+matrix_synapse_federation_port_enabled: false
+registration_shared_secret: "{{ reg_sec.stdout }}"
+search_all_users: true
+prefer_local_users: true
+turn_uris: ["turn:{{ matrix }}.{{ my_domain }}transport=udp","turn:{{ matrix }}.{{ my_domain }}?transport=tcp"]
+turn_shared_secret: "{{ turn_sec.stdout }}"
+turn_user_lifetime: 86400000
+admin_users:
+  - "@admin:{{ matrix }}.{{ my_domain }}"

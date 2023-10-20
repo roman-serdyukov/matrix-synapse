@@ -1,0 +1,33 @@
+# Task for install postgresql
+
+- name: Install postgresql | Installing the postgresql
+  become: True
+  ansible.builtin.apt:
+    name: postgresql
+    state: latest
+
+- name: Install postgresql | Read psql version
+  become: true
+  ansible.builtin.shell: ls /etc/postgresql/
+  register: folder_list
+  ignore_errors: true
+
+- name: Install postgresql | Show version
+  debug:
+    var: folder_list.stdout
+
+- name: Install postgresql | Set listen_addresses
+  become: true
+  ansible.builtin.lineinfile:
+    dest: "/etc/postgresql/{{folder_list.stdout }}/main/postgresql.conf"
+    regexp: "^listen_addresses = "
+    line: "listen_addresses = 'localhost'"
+
+- name: Install postgresql | Set password for postgres user & cluster db
+  become: true
+  become_user: postgres
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+  - createuser {{ db_user }}
+  - createdb --encoding=UTF8 --locale=C --template=template0 --owner={{ db_user }} {{ db_name }}
+  - psql -c "alter user {{ db_user }} with password '{{ db_pass }}';"

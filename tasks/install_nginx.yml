@@ -1,0 +1,50 @@
+# Task for install and configure nginx
+
+- name: Install nginx | Installing the nginx and certbot
+  become: True
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - '{{ nginx_pack }}'
+
+- name: Install nginx | Nginx reload
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nginx
+
+- name: Install nginx | Create cert
+  become: True
+  ansible.builtin.command: certbot --nginx --test-cert -m {{ email_address }} --agree-tos -d {{ item }}.{{ my_domain }} --quiet --no-self-upgrade
+#  ansible.builtin.command: certbot --nginx -m reserdukov@gmail.com --agree-tos -d {{ item }}.{{ my_domain }} --quiet --no-self-upgrade
+  with_items: "{{ domain_zones }}"
+
+- name: Install nginx | Copy config files
+  become: True
+  ansible.builtin.template:
+    src: templates/{{ item }}.conf.j2
+    dest: /etc/nginx/conf.d/{{ item }}.conf
+  with_items: "{{ conf_files }}"
+
+- name: Install nginx | Disable default
+  become: True
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Install nginx | Restart nginx
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nginx
+  notify: Restart matrix-synapse
+
+- name: Install nginx | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Install nginx | Create user in Matrix Synapse
+  become: True
+  ansible.builtin.command: register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml http://localhost:8008 -u {{ matrix_admin_user }} -p {{ matrix_admin_pass }} -a

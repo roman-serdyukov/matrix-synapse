@@ -1,0 +1,25 @@
+# Task for install element-web
+
+- name: Install element-web | Install docker
+  become: true
+  ansible.builtin.apt:
+    name: 
+      - docker
+      - docker-compose
+    state: latest
+
+- name: Install element-web | Create folder /opt/element-web
+  become: true
+  ansible.builtin.file:
+    path: /opt/element-web
+    state: directory
+
+- name: Install element-web | Copy config files
+  become: True
+  ansible.builtin.template:
+    src: templates/config.json.j2
+    dest: /opt/element-web/config.json
+
+- name: Install element-web | Run element-web in docker
+  become: True
+  ansible.builtin.command: docker run -d --name element-web --restart always -p 127.0.0.1:8080:80 -v /opt/element-web/config.json:/app/config.json vectorim/element-web:latest

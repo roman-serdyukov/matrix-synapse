@@ -1,0 +1,15 @@
+---
+# handlers file for matrix-synapse
+
+- name: Start matrix-synapse
+  become: true
+  ansible.builtin.systemd:
+    state: started
+    name: matrix-synapse
+    enabled: true
+
+- name: Restart matrix-synapse
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    name: matrix-synapse

@@ -1,0 +1,35 @@
+server {
+    listen 80;
+#    listen [::]:80;
+    server_name {{ element }}.{{ my_domain }};
+    return 301 https://$host$request_uri;
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Content-Security-Policy "frame-ancestors 'self'";
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+
+}
+
+server {
+    listen 443 ssl;
+#    listen [::]:443 ssl;
+    server_name  {{ element }}.{{ my_domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ element }}.{{ my_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ element }}.{{ my_domain }}/privkey.pem;
+
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Content-Security-Policy "frame-ancestors 'self'";
+
+    location / {
+        proxy_pass http://localhost:8080;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}

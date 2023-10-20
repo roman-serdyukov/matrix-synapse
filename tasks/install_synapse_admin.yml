@@ -1,0 +1,39 @@
+# Task for install synapse-admin
+
+- name: Install synapse-admin | Install docker
+  become: true
+  ansible.builtin.apt:
+    name: 
+      - docker
+      - docker-compose
+    state: latest
+
+- name: Install synapse-admin | Create folder /opt/synapse-admin
+  become: true
+  ansible.builtin.file:
+    path: /opt/synapse-admin
+    state: directory
+    mode: 0755
+
+- name: Install synapse-admin | Clone repository
+  become: true
+  ansible.builtin.git:
+    repo: '{{ git_repo }}'
+    dest: /opt/synapse-admin
+
+- name: Install synapse-admin | Copy Docker-compose file
+  become: true
+  ansible.builtin.template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/synapse-admin/docker-compose.yml
+    mode: 0755
+
+- name: Install synapse-admin | Create and start services
+  become: true
+  docker_compose:
+    project_src: /opt/synapse-admin/
+  register: output
+
+- name: Install synapse-admin | Show register
+  debug: 
+    var: output

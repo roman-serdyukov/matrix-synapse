@@ -1,0 +1,22 @@
+# Install other packages
+
+- name: Install packages | Update apt cache
+  become: true
+  apt: 
+    update_cache: yes 
+    cache_valid_time: 3600
+  ignore_errors: true
+
+- name: Install packages | Installing the required packages
+  become: True
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - '{{ other_pack }}'
+  ignore_errors: true
+
+- name: Install packages | Install psycopg2
+  become: true
+  ansible.builtin.pip:
+    name: psycopg2

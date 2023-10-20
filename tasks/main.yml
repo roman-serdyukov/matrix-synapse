@@ -1,0 +1,23 @@
+---
+# tasks file for matrix-synapse
+
+- name: Matrix-synapse | Install other packages
+  include_tasks: install_other.yml
+
+- name: Matrix-synapse | Install and configure postgresql
+  include_tasks: install_postgreql.yml
+
+- name: Matrix-synapse | Install matrix-synapse
+  include_tasks: install_matrix_synapse.yml
+
+- name: Matrix-synapse | Install and configure nginx with ssl certificates
+  include_tasks: install_nginx.yml
+
+- name: Matrix-synapse | Install and configure coturn
+  include_tasks: install_coturn.yml
+
+- name: Matrix-synapse | Install and configure element-web
+  include_tasks: install_element_web.yml
+
+- name: Matrix-synapse | Install and configure synapse-admin
+  include_tasks: install_synapse_admin.yml

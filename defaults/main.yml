@@ -33,7 +33,7 @@ nginx_pack:
 repo_url: https://packages.matrix.org/debian/
 key_folder: /usr/share/keyrings/
 
-#my_domain: reserdukov.ru
+my_domain: reserdukov.ru
 
 matrix: matrix
 element: element

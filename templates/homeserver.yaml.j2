@@ -53,3 +53,17 @@ turn_shared_secret: "{{ turn_sec.stdout }}"
 turn_user_lifetime: 86400000
 admin_users:
   - "@admin:{{ matrix }}.{{ my_domain }}"
+
+
+#retention:
+#  enabled: true
+#  default_policy:
+#    min_lifetime: 1d
+#    max_lifetime: 1y
+#  allowed_lifetime_min: 1d
+#  allowed_lifetime_max: 1y
+#  purge_jobs:
+#    - longest_max_lifetime: 3d
+#      interval: 12h
+#    - shortest_max_lifetime: 3d
+#      interval: 1d

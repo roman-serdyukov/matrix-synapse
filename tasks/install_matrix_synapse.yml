@@ -27,10 +27,12 @@
 
 - name: Install matrix-synapse | Generate registration shared secret
   ansible.builtin.shell: openssl rand -base64 48
+  run_once: true
   register: reg_sec
 
 - name: Install matrix-synapse | Generate turn shared secret
   ansible.builtin.shell: openssl rand -base64 48
+  run_once: true
   register: turn_sec
 
 - name: Install matrix-synapse | Copy config files
